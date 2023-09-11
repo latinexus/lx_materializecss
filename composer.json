@@ -1,0 +1,15 @@
+{
+  "name": "latinexus/lx_materializecss",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "eric",
+      "email": "elapez@hotmail.com"
+    }
+  ],
+  "require": {
+    "latinexus/lx_htmltag": "1.0.0"
+  }
+}
