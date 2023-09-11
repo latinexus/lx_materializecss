@@ -1,7 +1,8 @@
 <?php
 namespace LxMaterializeCss;
 
-use Lib\LxBloque\LxBloque;
+use LxBloque\LxBloque;
+
 class LxMaterializeCss
 {
     /**
