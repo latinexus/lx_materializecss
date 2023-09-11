@@ -10,6 +10,6 @@
     }
   ],
   "require": {
-    "latinexus/lx_htmltag": "1.0.0"
+    "latinexus/lx_htmltag": "1.*"
   }
 }
