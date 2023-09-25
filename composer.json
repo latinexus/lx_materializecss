@@ -1,5 +1,5 @@
 {
-  "name": "latinexus/lx_materializecss",
+  "name": "latinexus/materializecss",
   "description": "Simplifying Materializecss styles and components from PHP",
   "type": "library",
   "require": {
