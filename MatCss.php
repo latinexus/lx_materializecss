@@ -3,7 +3,7 @@ namespace LxMaterializeCss;
 
 use LxBloque\LxBloque;
 
-class LxMaterializeCss
+class MatCss
 {
     /**
      * Constructor de la clase
