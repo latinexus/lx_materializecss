@@ -1,15 +1,29 @@
 {
   "name": "latinexus/lx_materializecss",
-  "description": "description",
-  "minimum-stability": "stable",
-  "license": "proprietary",
-  "authors": [
-    {
-      "name": "eric",
-      "email": "elapez@hotmail.com"
-    }
-  ],
+  "description": "Simplifying Materializecss styles and components from PHP",
+  "type": "library",
   "require": {
     "latinexus/lx_htmltag": "1.*"
-  }
+  },
+  "license": "MIT",
+  "homepage": "https://latinex.us",
+  "keywords": ["Materialize CSS PHP"],
+  "autoload": {
+    "psr-4": {
+      "latinexus\\Materialize\\": "src/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/latinexus/lx_materializecss.git"
+    }
+  ],
+  "minimum-stability": "stable",
+  "authors": [
+    {
+      "name": "Eric larrea",
+      "email": "eric@latinex.us"
+    }
+  ]
 }
