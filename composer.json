@@ -10,7 +10,7 @@
   "keywords": ["Materialize CSS PHP"],
   "autoload": {
     "psr-4": {
-      "latinexus\\Materialize\\": "src/"
+      "Latinexus\\Materialize\\": "src/"
     }
   },
   "repositories": [
