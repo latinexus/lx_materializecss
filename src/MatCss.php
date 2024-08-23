@@ -703,11 +703,14 @@ class MatCss
             $obj = $c;
         }
 
-
-        return mat_filas($obj, $datos);
-
+        return $this->mat_filas($obj, $datos);
     }
 
+    /** ***** VERSIÓN ACTUALIZADA POR VENPAR PARA ADMITIR ICONO DE BORRADO *****
+     * @param $obj
+     * @param array $datos
+     * @return mixed
+     */
     public function mat_filas($obj, $datos = [])
     {
         $b = new HtmlTag();
@@ -724,6 +727,7 @@ class MatCss
             $e = in_array("edit", $datos);
             $o = in_array("otro", $datos); // Para añadir un ícono adicional
             $ol = array_key_exists("ol", $datos) ? $datos["ol"] : "select";
+            $od = array_key_exists("od", $datos) ? $datos["od"] : "delete";
             $v = array_key_exists("vista", $datos) ? E_URL . $datos["vista"] : E_URL . E_VIEW;
             $m = array_key_exists("msg", $datos) ? $datos["msg"] : "De verdad lo quieres borrar, esta acción no podrá deshacerse";
             if(in_array("inv", $datos))
@@ -743,14 +747,7 @@ class MatCss
                      */
                     if(is_bool($l))
                     {
-                        if(!empty($n2))
-                        {
-                            $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&id='.$elem->$i.'">' . $elem->$n . " - " . $elem->$n2 . '</a>';
-                        }
-                        else
-                        {
-                            $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&id='.$elem->$i.'">' . $elem->$n . '</a>';
-                        }
+                        $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&id='.$elem->$i.'">' . $elem->$n . " - " . $elem->$n2 . '</a>';
 
                         if($d)
                         {
@@ -796,12 +793,12 @@ class MatCss
 
                         if($d)
                         {
-                            $lista .= '<a href="'.$v.'?a='.$l.'&a1=delete&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="if(confirma(\''.$m.'\')){return true;}else{return false;}"><i class="material-icons red-text">delete</i></a>';
+                            $lista .= '<a href="'.$v.'?a=select&a1=' . $od . '&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="if(confirma(\''.$m.'\')){return true;}else{return false;}"><i class="material-icons red-text">delete</i></a>';
                         }
 
                         if($e)
                         {
-                            $lista .= '<a href="'.$v.'?a='.$l.'&a1=select&id='.$elem->$i.'" class="secondary-content '.$c.'"><i class="material-icons green-text">edit</i></a>';
+                            $lista .= '<a href="'.$v.'?a=select&a1=' . $ol . '&id='.$elem->$i.'" class="secondary-content '.$c.'"><i class="material-icons green-text">edit</i></a>';
                         }
 
                         if($o)
@@ -890,12 +887,12 @@ class MatCss
                 {
                     if(!in_array($ea->$i, $omite))
                     {
-                        $retorno[$ea->$i] = mat_selectNombreArray($n, $ea, $i);
+                        $retorno[$ea->$i] = $this->mat_selectNombreArray($n, $ea);
                     }
                 }
                 else
                 {
-                    $retorno[$ea->$i] = mat_selectNombreArray($n, $ea);
+                    $retorno[$ea->$i] = $this->mat_selectNombreArray($n, $ea);
                 }
             }
         }
