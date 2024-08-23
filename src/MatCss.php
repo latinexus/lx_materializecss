@@ -268,46 +268,6 @@ class MatCss
     }
 
     /**
-     * MATERIALIZECSS ( CHECKBOX ) VERSIÓN VIEJA DE MATERIALIZECSS
-     * Devuelve un "checkbox" con formato para materializecss
-     *
-     * @param $label
-     * @param $name
-     * @param string $envoltura
-     * @param string $value
-     * @param string $id
-     * @param string $clase
-     * @param string $checked
-     * @return string
-     */
-    public function mat_check_old($label, $name, $value ="1", $id="", $clase="filled-in", $checked="")
-    {
-        $b = new HtmlTag();
-
-        if (!empty($id)) {
-            $idShow = $id;
-        } else {
-            $idShow = $name;
-        }
-
-        if($checked == "")
-        {
-            $params = ["name"=>$name, "id"=>$idShow, "type"=>"checkbox", "value"=>$value, "class"=>$clase];
-        }
-        else
-        {
-            $params = ["name"=>$name, "id"=>$idShow, "type"=>"checkbox", "value"=>$value, "class"=>$clase, "checked"=>"checked"];
-        }
-
-        $ip = $b->noBlk($params);
-        $lab = $b->blk($label, ["for"=>$idShow], "label");
-
-        $retorno = $b->blk($ip.$lab, [], "p");
-
-        return $this->mat_form($retorno, -1);
-    }
-
-    /**
      * MATERIALIZECSS ( CHECKBOX ) NUEVA VERSIÓN DE MATERIALIZE
      * Devuelve un "checkbox" con formato para materializecss
      *
