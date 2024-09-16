@@ -645,12 +645,15 @@ class MatCss
     }
 
     /**
-    $n = $datos["nombre"]
-    $i = $datos["id"]
-    $c = $datos["class"]
-    $l = datos["link"]
-    $d = $datos["delete"]
-    $v = $datos["vista"]
+     *    $n = $datos["nombre"]
+     *    $i = $datos["id"]
+     *    $c = $datos["class"]
+     *    $l = datos["link"]
+     *    $d = $datos["delete"]
+     *    $v = $datos["vista"]
+     *   Si $p es una  adena vacía, entonces es porque $c ya es
+     *   un resultado parcial del modelo y no el modelo completo
+     *   Ejemplo: $c = Casas::where("nuevas", 1)->get();
      */
     public function mat_colection($c, $datos = ["a"], $p="")
     {
