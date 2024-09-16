@@ -2,7 +2,7 @@
   "name": "latinexus/lx_materializecss",
   "description": "Simplifying Materializecss styles and components to applying from PHP",
   "type": "library",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "homepage": "https://latinex.us",
   "keywords": ["Materialize CSS PHP"],
   "require": {
