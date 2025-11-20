@@ -179,7 +179,7 @@ class MatCss
         else
         {
             $retorno .= '<div><small>'.$label.':</small></div>';
-            $retorno .= '<select name="' . $name . '" id="' . $idShow . ' " class="browser-default" ' . $extra . '>'.PHP_EOL;
+            $retorno .= '<select name="' . $name . '" id="' . $idShow . '" class="browser-default" ' . $extra . '>'.PHP_EOL;
             $label = "";
         }
 
