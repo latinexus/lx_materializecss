@@ -127,7 +127,7 @@ class MatCss
             $arregloOpciones["maxlength"] = $maxlength;
         }
 
-        if($arregloOpciones["type"] == "number")
+        if($arregloOpciones["type"] == "number" || $arregloOpciones["type"] == "date")
         {
             if(!empty($min))
             {
