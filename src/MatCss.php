@@ -49,7 +49,8 @@ class MatCss
         }
 
         // permitir paths de assets con '/', '.' además de letras, números, '-' y '_'
-        $vista = $rawVista === '' ? '' : preg_replace('/[^A-Za-z0-9_\/\.\-]/', '', ltrim($rawVista, '/'));
+        // nota: el punto no necesita escape dentro de una clase de caracteres
+        $vista = $rawVista === '' ? '' : preg_replace('/[^A-Za-z0-9_\/.-]/', '', ltrim($rawVista, '/'));
 
         if ($base === '' && $vista === '') {
             return '';
@@ -64,6 +65,19 @@ class MatCss
         }
 
         return $base . $vista;
+    }
+
+    // nuevo método privado que replica la función global altImg
+    private function altImg(string $argumento = ""): string
+    {
+        if (!empty($argumento)) {
+            $argumentoNew = strtr($argumento, [
+                chr(10) => "",
+                chr(13) => ""
+            ]);
+            return ' alt="' . htmlentities($argumentoNew, ENT_QUOTES) . '" title="' . htmlentities($argumentoNew, ENT_QUOTES) . '" ';
+        }
+        return "";
     }
 
     /**
@@ -393,7 +407,7 @@ class MatCss
 
         $imgPath = isset($arr['img']) ? $arr['img'] : "";
         $imagenUrl = $this->resolveVistaUrl(['vista' => $imgPath]);
-        $i = '<img src="'.$imagenUrl.'" class="activator" '.altImg($arr['alt'] ?? '').' />';
+        $i = '<img src="'.$imagenUrl.'" class="activator" ' . $this->altImg($arr['alt'] ?? '') . ' />';
         $cont .= $b->blk($i, ["class"=>"card-image waves-effect waves-block waves-light"]);
 
         $t = '<span class="card-title activator grey-text text-darken-4">'.($arr['titulo'] ?? '').'<i class="material-icons right">more_vert</i></span>';
@@ -416,7 +430,7 @@ class MatCss
 
         $imgPath = isset($arr["img"]) ? $arr["img"] : "";
         $imagenUrl = $this->resolveVistaUrl(['vista' => $imgPath]);
-        $imagen = '<img src="' . $imagenUrl . '" ' . altImg($arr["titulo"] ?? "") . ' />';
+        $imagen = '<img src="' . $imagenUrl . '" ' . $this->altImg($arr["titulo"] ?? "") . ' />';
         $img = $b->blk($imagen, ["class"=>"card-image"]);
 
         $cont = '<h3>' . ($arr["titulo"] ?? "") . '</h3>';
@@ -738,13 +752,51 @@ class MatCss
             $m = array_key_exists("msg", $datos) ? $datos["msg"] : "De verdad lo quieres borrar, esta acción no podrá deshacerse";
             if(in_array("inv", $datos))
             {
-                $obj = $obj->sortDesc();
+                // soportar colecciones con sortDesc() y arrays simples
+                if (is_object($obj) && method_exists($obj, 'sortDesc')) {
+                    $obj = $obj->sortDesc();
+                } elseif (is_array($obj)) {
+                    $obj = array_reverse($obj);
+                }
             }
 
 
             foreach($obj as $elem)
             {
-                $lista .= '<li class="collection-item">';
+                $lista .= '<li class="collection-item' . '">';
+
+                // construir nombre a mostrar protegiendo nombre y nombre2 (soporta string o array)
+                $displayName = '';
+                if (is_array($n)) {
+                    $parts = [];
+                    foreach ($n as $prop) {
+                        if (isset($elem->{$prop}) && $elem->{$prop} !== '') {
+                            $parts[] = $elem->{$prop};
+                        }
+                    }
+                    $displayName = implode(' ', $parts);
+                } else {
+                    $displayName = isset($elem->{$n}) ? $elem->{$n} : '';
+                }
+
+                // si existe nombre2 y no está vacío, añadirlo protegidamente
+                if (!empty($n2)) {
+                    if (is_array($n2)) {
+                        $parts2 = [];
+                        foreach ($n2 as $prop2) {
+                            if (isset($elem->{$prop2}) && $elem->{$prop2} !== '') {
+                                $parts2[] = $elem->{$prop2};
+                            }
+                        }
+                        if (!empty($parts2)) {
+                            $displayName .= ($displayName !== '' ? ' - ' : '') . implode(' ', $parts2);
+                        }
+                    } else {
+                        if (isset($elem->{$n2}) && $elem->{$n2} !== '') {
+                            $displayName .= ($displayName !== '' ? ' - ' : '') . $elem->{$n2};
+                        }
+                    }
+                }
 
                 if($l)
                 {
@@ -753,11 +805,11 @@ class MatCss
                      */
                     if(is_bool($l))
                     {
-                        $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&id='.$elem->$i.'">' . $elem->$n . " - " . $elem->$n2 . '</a>';
+                        $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&id='.$elem->$i.'">' . $displayName . '</a>';
 
                         if($d)
                         {
-                            $lista .= '<a href="'.$v.'?a=delete&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="if(confirma(\''.$m.'\')){return true;}else{return false;}"><i class="material-icons red-text">delete</i></a>';
+                            $lista .= '<a href="'.$v.'?a=delete&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="return confirma(\''.$m.'\');"><i class="material-icons red-text">delete</i></a>';
                         }
 
                         if($e)
@@ -795,11 +847,11 @@ class MatCss
                     }
                     else
                     {
-                        $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&a1=' . $ol . '&id='.$elem->$i.'">'.$elem->$n . " - " . $elem->$n2 . '</a>';
+                        $lista .= '<a class="'.$c.'" href="'.$v.'?a=select&a1=' . $ol . '&id='.$elem->$i.'">'.$displayName . '</a>';
 
                         if($d)
                         {
-                            $lista .= '<a href="'.$v.'?a=select&a1=' . $od . '&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="if(confirma(\''.$m.'\')){return true;}else{return false;}"><i class="material-icons red-text">delete</i></a>';
+                            $lista .= '<a href="'.$v.'?a=select&a1=' . $od . '&id='.$elem->$i.'" class="secondary-content '.$c.' mIzq10" onclick="return confirma(\''.$m.'\');"><i class="material-icons red-text">delete</i></a>';
                         }
 
                         if($e)
@@ -842,7 +894,7 @@ class MatCss
                     /**
                      * Lista sencilla
                      */
-                    $lista .= $elem->$n;
+                    $lista .= $displayName;
                 }
 
                 $lista .= '</li>';
@@ -1132,14 +1184,4 @@ class MatCss
         return $retorno;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
