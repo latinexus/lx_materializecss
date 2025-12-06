@@ -40,16 +40,16 @@ $cardReveal = [
     'titulo' => 'Card con reveal',
     'texto' => '<p>Texto que se muestra en la parte oculta de la card.</p>',
     // ruta relativa desde la raíz del documento (try/) para que php -S pueda servirla
-    'img' => 'img/maxima.jpg',
+    'img' => 'http://localhost/cp_materializecss/try/img/maxima.jpg',
     'alt' => 'Imagen demo',
     'link' => 'https://example.com',
     'textoLink' => 'Ir al enlace'
 ];
 
 $cardHorizontal = [
-    'titulo' => 'Card horizontal',
-    'texto' => '<p>Contenido de ejemplo en la card horizontal.</p>',
-    'img' => 'img/maxima.jpg',
+    'titulo' => 'Horizontal',
+    'texto' => '<p>Contenido de ejemplo.</p>',
+    'img' => 'http://localhost/cp_materializecss/try/img/maxima.jpg',
     'link' => 'https://example.com'
 ];
 
@@ -76,7 +76,9 @@ $selectOptionsFromArray = $mat->mat_select_list($sampleSelectArray, 'id', 'nombr
 <head>
     <meta charset="UTF-8">
     <title>MatCss - Ejemplos</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <style>
         body{ padding:20px; }
