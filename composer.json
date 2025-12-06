@@ -18,6 +18,10 @@
     {
       "type": "vcs",
       "url": "https://github.com/latinexus/lx_materializecss.git"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/latinexus/lx_htmltag.git"
     }
   ],
   "minimum-stability": "stable",
