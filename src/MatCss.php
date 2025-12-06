@@ -13,6 +13,59 @@ class MatCss
         // inicializaciones necesarias
     }
 
+    private function resolveVistaUrl(array $datos = []): string
+    {
+        // base desde la constante o fallback a $_SERVER
+        if (defined('E_URL') && E_URL !== '') {
+            $baseRaw = (string) E_URL;
+        } else {
+            $scheme = 'http';
+            if (!empty($_SERVER['REQUEST_SCHEME'])) {
+                $scheme = $_SERVER['REQUEST_SCHEME'];
+            } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+                $scheme = 'https';
+            }
+            $host = $_SERVER['SERVER_NAME'] ?? ($_SERVER['HTTP_HOST'] ?? 'localhost');
+            $baseRaw = $scheme . '://' . $host . '/';
+        }
+
+        $baseRaw = trim($baseRaw);
+        $base = $baseRaw === '' ? '' : rtrim($baseRaw, '/') . '/';
+
+        // obtener rawVista desde $datos o E_VIEW
+        if (array_key_exists('vista', $datos) && $datos['vista'] !== '') {
+            $rawVista = (string) $datos['vista'];
+        } elseif (defined('E_VIEW') && E_VIEW !== '') {
+            $rawVista = (string) E_VIEW;
+        } else {
+            $rawVista = '';
+        }
+
+        $rawVista = trim($rawVista);
+
+        // si es URL absoluta (http(s):// o //) devolver tal cual
+        if ($rawVista !== '' && preg_match('#^(https?:)?//#i', $rawVista)) {
+            return $rawVista;
+        }
+
+        // permitir paths de assets con '/', '.' además de letras, números, '-' y '_'
+        $vista = $rawVista === '' ? '' : preg_replace('/[^A-Za-z0-9_\/\.\-]/', '', ltrim($rawVista, '/'));
+
+        if ($base === '' && $vista === '') {
+            return '';
+        }
+
+        if ($base === '') {
+            return $vista;
+        }
+
+        if ($vista === '') {
+            return rtrim($base, '/');
+        }
+
+        return $base . $vista;
+    }
+
     /**
          * @param $contenido
          * @param string $envoltura
@@ -319,7 +372,7 @@ class MatCss
     public function mat_card($titulo, $contenido)
     {
         $b = new HtmlTag();
-        $title = $b->blk($titulo, ["class"=>"card-title", "span"]);
+        $title = $b->blk($titulo, ["class"=>"card-title"], "span");
         $cont =  $b->blk($title . $contenido, ["class"=>"card-content"]);
         return $b->blk($cont,["class"=>"card"]);
     }
@@ -327,74 +380,64 @@ class MatCss
     /** CARD REVEAL */
     public function mat_card_reveal($arr)
     {
+
+        //    $arr['titulo']
+        //    $arr['texto']
+        //    $arr['img']
+        //    $arr['alt']
+        //    $arr['link']
+        //    $arr['textoLink']
+
         $b = new HtmlTag();
         $cont = "";
 
-    //    $arr['titulo']
-    //    $arr['texto']
-    //    $arr['img']
-    //    $arr['alt']
-    //    $arr['link']
-    //    $arr['textoLink']
+        $imgPath = isset($arr['img']) ? $arr['img'] : "";
+        $imagenUrl = $this->resolveVistaUrl(['vista' => $imgPath]);
+        $i = '<img src="'.$imagenUrl.'" class="activator" '.altImg($arr['alt'] ?? '').' />';
+        $cont .= $b->blk($i, ["class"=>"card-image waves-effect waves-block waves-light"]);
 
-        $i = '<img src="'.$arr['img'].'" class="activator" '.altImg($arr['alt']).' />';
-        $cont .= $b->blk($i,["class"=>"card-image waves-effect waves-block waves-light"]);
+        $t = '<span class="card-title activator grey-text text-darken-4">'.($arr['titulo'] ?? '').'<i class="material-icons right">more_vert</i></span>';
+        $t .= (isset($arr['link']) && !empty($arr['link'])) ? '<p><a href="'.$arr['link'].'">'.($arr['textoLink'] ?? '').'</a></p>' : '';
+        $cont .= $b->blk($t, ["class"=>"card-content"]);
 
-        $t = '<span class="card-title activator grey-text text-darken-4">'.$arr['titulo'].'<i class="material-icons right">more_vert</i></span>';
-        $t .= (isset($arr['link']) && !empty($arr['link'])) ? '<p><a href="'.$arr['link'].'">'.$arr['textoLink'].'</a></p>' : '';
-        $cont .= $b->blk($t,["class"=>"card-content"]);
-
-        $r = '<span class="card-title grey-text text-darken-4">'.$arr['titulo'].'<i class="material-icons right">close</i></span>';
+        $r = '<span class="card-title grey-text text-darken-4">'.($arr['titulo'] ?? '').'<i class="material-icons right">close</i></span>';
         $r .= !empty($arr['texto']) ? $arr['texto'] : "";
-        $cont .= $b->blk($r,["class"=>"card-reveal letra4"]);
+        $cont .= $b->blk($r, ["class"=>"card-reveal letra4"]);
 
-
-        return $b->blk($cont,["class"=>"card"]);
+        return $b->blk($cont, ["class"=>"card"]);
     }
+
+
 
     /** HORIZONTAL CARD */
     public function mat_card_horizontal($arr)
     {
-        /**
-         *  $arr['titulo'] --> Titulo de la tarjeta
-         *  $arr['texto'] --> Texto de la tarjeta
-         *  $arr['img'] --> Imagen de la tarjeta
-         *  $arr['link'] --> Enlace de la tarjeta
-         *  $arr['env'] --> Etiqueta de envoltura a la tarjeta horizontal
-         */
         $b = new HtmlTag();
 
-        $imagen = '<img src="' . E_URL . $arr["img"] . '" '.altImg($arr["titulo"]).' />';
+        $imgPath = isset($arr["img"]) ? $arr["img"] : "";
+        $imagenUrl = $this->resolveVistaUrl(['vista' => $imgPath]);
+        $imagen = '<img src="' . $imagenUrl . '" ' . altImg($arr["titulo"] ?? "") . ' />';
         $img = $b->blk($imagen, ["class"=>"card-image"]);
 
-        $cont = '<h3>'.$arr["titulo"].'</h3>';
-        $cont .= $arr["texto"];
+        $cont = '<h3>' . ($arr["titulo"] ?? "") . '</h3>';
+        $cont .= $arr["texto"] ?? "";
         $contenido = $b->blk($cont, ["class"=>"card-content"]);
 
-        if(isset($arr["link"]) && !empty($arr["link"]))
-        {
+        if (isset($arr["link"]) && !empty($arr["link"])) {
             $enlace = $b->blk('<a href="'.$arr["link"].'"><i class="material-icons">add_circle</i></a>', ["class"=>"card-action"]);
-        }
-        else
-        {
+        } else {
             $enlace = "";
         }
 
         $stack = $b->blk($contenido.$enlace, ["class"=>"card-stacked"]);
-
         $car = $img . $stack;
+        $retorno = $b->blk($car, ["class"=>"card horizontal"]);
 
-        $retorno = $b->blk($car,["class"=>"card horizontal"]);
-
-        if(isset($arr["env"]))
-        {
-            return $b->blk($retorno,["class"=>$arr["env"]]);
-        }
-        else
-        {
+        if (isset($arr["env"])) {
+            return $b->blk($retorno, ["class"=>$arr["env"]]);
+        } else {
             return $retorno;
         }
-
     }
 
     /**
@@ -691,7 +734,7 @@ class MatCss
             $o = in_array("otro", $datos); // Para añadir un ícono adicional
             $ol = array_key_exists("ol", $datos) ? $datos["ol"] : "select";
             $od = array_key_exists("od", $datos) ? $datos["od"] : "delete";
-            $v = array_key_exists("vista", $datos) ? E_URL . $datos["vista"] : E_URL . E_VIEW;
+            $v = $this->resolveVistaUrl($datos); ///array_key_exists("vista", $datos) ? E_URL . $datos["vista"] : E_URL . E_VIEW;
             $m = array_key_exists("msg", $datos) ? $datos["msg"] : "De verdad lo quieres borrar, esta acción no podrá deshacerse";
             if(in_array("inv", $datos))
             {
@@ -1002,41 +1045,43 @@ class MatCss
     {
         $campos = $clase::all();
 
+        if (count($campos) === 0) {
+            return [];
+        }
 
-        return camposModelo($campos[0]);
+        // camposModelo espera JSON/string; pasar el primer registro como JSON
+        return $this->camposModelo(json_encode($campos[0]));
     }
 
     /**
      * @return string
      *
-     * Devuelve los elementos de formularios según los campos de un modelo de eloquent
+     * Devuelve los elementos de formularios según los campos de un modelo de eloquent.
+     * Ahora recibe el modelo (o array/obj) como parámetro opcional.
      */
-    public function camposMaterialize()
+    public function camposMaterialize($modelo = null)
     {
+        if ($modelo === null) {
+            // no hay modelo; devolver cadena vacía para mantener compatibilidad
+            return "";
+        }
 
-        $lista = camposModelo();
+        // obtener lista de campos (camposModelo devuelve [campo => tipo])
+        $lista = $this->camposModelo(is_string($modelo) ? $modelo : json_encode($modelo));
 
         $retorno = "";
-        foreach($lista as $li)
-        {
-            if(substr($li,-3) == "_id")
-            {
-                // asumimos que es un campo FK (foreing Key)
-                // lo montamos en un select, de lo contrario usaremos un input
-                $retorno .= mat_select(ucfirst(substr($li,0, -3)), $li, [], "col s12 l6").PHP_EOL;
-
-            }
-            else
-            {
-                if($li != "id")
-                {
-                    $retorno .= mat_input(ucfirst($li), $li, ["envoltura" => "col s12 l6"]) . PHP_EOL;
+        foreach ($lista as $campo => $tipo) {
+            if (substr($campo, -3) === "_id") {
+                // FK -> select
+                $retorno .= $this->mat_select(ucfirst(substr($campo, 0, -3)), $campo, [], "col s12 l6") . PHP_EOL;
+            } else {
+                if ($campo !== "id") {
+                    $retorno .= $this->mat_input(ucfirst($campo), $campo, ["envoltura" => "col s12 l6"]) . PHP_EOL;
                 }
             }
         }
 
         return $retorno;
-
     }
 
     public function collapsible($lista, $datos = [])
@@ -1081,7 +1126,7 @@ class MatCss
         for($clasifica = 5; $clasifica >= 1; $clasifica--)
         {
             $clasi = $cl == $clasifica ? 1 : 0;
-            $retorno .= mat_radio(implode("", $allStar), "empresaCalifica",  $clasifica, uniqid(), "with-gap", $clasi);
+            $retorno .= $this->mat_radio(implode("", $allStar), "empresaCalifica",  $clasifica, uniqid(), "with-gap", $clasi);
             array_shift($allStar);
         }
         return $retorno;
